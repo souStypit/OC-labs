@@ -3,6 +3,10 @@
         "types.h": "c",
         "unistd.h": "c",
         "socket.h": "c",
-        "in.h": "c"
+        "in.h": "c",
+        "ioctl.h": "c",
+        "stdio.h": "c",
+        "time.h": "c",
+        "stdlib.h": "c"
     }
 }

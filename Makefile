@@ -24,8 +24,9 @@ lab3: $(LAB3PATH)main.c
 lab5: $(LAB5PATH)main.c
 	$(CC) $(CFLAGS) -o sobel $^ -lm -ljpeg -lpthread
 
-lab6: $(LAB6PATH)main.c
-	$(CC) $(CFLAGS) -o sockets $^
+lab6: $(LAB6PATH)server.c $(LAB6PATH)client.c
+	$(CC) $(CFLAGS) -o server $(LAB6PATH)server.c
+	$(CC) $(CFLAGS) -o client $(LAB6PATH)client.c
 
 ###CLANGS###
 clang: clang_rb clang_lab1 clang_lab3 clang_lab6
