@@ -14,12 +14,13 @@ void errorMessage(int condition, const char *message, ...);
 
 // FUNCTIONS
 int shell(char **args);
+void signal_handler(void);
 
-void signal_handler();
+// GLOBAL VARIABLES
+pid_t pid = -1;
 
 //----------//----------//----------//----------//----------//
 int main(void) {
-    // signal(SIGINT, SIG_DFL);
     signal(SIGINT, signal_handler);
 
     int status = 1;
@@ -39,8 +40,8 @@ int main(void) {
 // FUNCTION IMPLEMETATION
 int shell(char **args) {
     if (strcmp(args[0], "exit") == 0) return 0;
-    pid_t pid = fork();
-
+    
+    pid = fork();
     switch (pid) {
         case -1:
             printf("Fork failed");
@@ -55,18 +56,11 @@ int shell(char **args) {
 
     return 1;
 }
-void signal_handler() {
-    pid_t pid;
-    printf("Type process id that you want to kill (-1 to cancel, 0 to kill current process): ");
-    fflush(stdout);
-    scanf("%d\n", &pid);
+void signal_handler(void) {
+    printf("Stoping the program with id: %d\n", pid);
 
-    if (pid != -1) {
-        kill(pid, SIGTERM);
-        return;
-    }
-
-    printf("Terminating is cancelled.");
+    if (pid == -1) kill(0, SIGTERM);
+    else kill(pid, SIGTERM);
 }
 void errorMessage(int condition, const char *fmt, ...) {
     //#include <stdarg.h>
@@ -102,7 +96,6 @@ char *setString(void) {
     char *string = malloc(sizeof(char));
     int i = 0;
     char ch;
-
 
     while ((ch = getchar()) != '\n') {
         string[i++] = ch;
