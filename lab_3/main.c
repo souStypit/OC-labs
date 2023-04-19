@@ -14,7 +14,8 @@ void errorMessage(int condition, const char *message, ...);
 
 // FUNCTIONS
 int shell(char **args);
-void signal_handler(void);
+int shell_cd(char **args);
+void signal_handler(int sig);
 
 // GLOBAL VARIABLES
 pid_t pid = -1;
@@ -40,6 +41,7 @@ int main(void) {
 // FUNCTION IMPLEMETATION
 int shell(char **args) {
     if (strcmp(args[0], "exit") == 0) return 0;
+    if (strcmp(args[0], "cd") == 0) return shell_cd(args);
     
     pid = fork();
     switch (pid) {
@@ -56,11 +58,20 @@ int shell(char **args) {
 
     return 1;
 }
-void signal_handler(void) {
+int shell_cd(char **args) {
+    if (args[1]) {
+        if (chdir(args[1]) != 0) printf("cd");
+    } else {
+        printf("usage: cd <directory>\n");
+    }
+    
+    return 1;
+}
+void signal_handler(int sig) {
     printf("Stoping the program with id: %d\n", pid);
 
     if (pid == -1) kill(0, SIGTERM);
-    else kill(pid, SIGTERM);
+    else kill(pid, sig);
 }
 void errorMessage(int condition, const char *fmt, ...) {
     //#include <stdarg.h>
