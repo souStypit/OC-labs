@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 int main() {
-    int server_sockfd, clinet_sockfd;
+    int server_sockfd, client_sockfd;
     int server_len, client_len;
     struct sockaddr_un server_address;
     struct sockaddr_un client_address;
@@ -26,11 +26,11 @@ int main() {
         printf("server waiting\n");
 
         client_len = sizeof(client_address);
-        clinet_sockfd = accept(server_sockfd, (struct sockaddr *)&client_address, &client_len);
+        client_sockfd = accept(server_sockfd, (struct sockaddr *)&client_address, &client_len);
 
-        read(clinet_sockfd, &ch, 1);
+        read(client_sockfd, &ch, 1);
         ch++;
-        write(clinet_sockfd, &ch, 1);
-        close(clinet_sockfd);
+        write(client_sockfd, &ch, 1);
+        close(client_sockfd);
     }
 }
