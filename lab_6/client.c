@@ -1,5 +1,6 @@
 #include <stdio.h> 
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h> 
 #include <sys/types.h> 
 #include <sys/socket.h> 
@@ -21,19 +22,20 @@ int main() {
     address.sin_port = htons(9734);
     len = sizeof(address);
 
-    printf("Write a message: ");
-    scanf("%s", msg);
-
     result = connect(sockfd, (struct sockaddr *)&address, len);
     if (result == -1) {
         perror("oops: client1");
         exit(1);
     }
 
-    write(sockfd, &msg, CLIENT_MSG_SIZE);
-    read(sockfd, &msg, CLIENT_MSG_SIZE);
-    printf("msg from server = %s\n", msg);
+    do {
+        printf("Write a message: ");
+        scanf("%s", msg);
+
+        write(sockfd, &msg, CLIENT_MSG_SIZE);
+        read(sockfd, &msg, CLIENT_MSG_SIZE);
+    } while (strcmp(msg, "exit") != 0);
+
     close(sockfd);
     exit(0);
-
 }
