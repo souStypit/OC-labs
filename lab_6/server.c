@@ -30,39 +30,53 @@ int main() {
 
     FD_ZERO(&readfds);
     FD_SET(server_sockfd, &readfds);
+    int fd_count = 5;
     
     while(1) {
-        int fd;
-
         testfds = readfds;
 
         printf("server waiting\n");
-        result = select(FD_SETSIZE, &testfds, (fd_set *)NULL, (fd_set *)NULL, (struct timeval *)NULL);
-        if (result < 1/* ??? result != -1 ??? */) {
+        result = select(fd_count, &testfds, (fd_set *)NULL, (fd_set *)NULL, (struct timeval *)NULL);
+        if (result == -1) {
             perror("server");
             exit(1);
         }
 
-        for (fd = 0; fd < FD_SETSIZE; fd++) {
+        for (int fd = 0; fd < fd_count; fd++) {
             if (FD_ISSET(fd, &testfds)) {
                 if (fd == server_sockfd) {
                     client_len = sizeof(client_address);
                     client_sockfd = accept(server_sockfd, (struct sockaddr *)&client_address, (socklen_t *)&client_len);
                     FD_SET(client_sockfd, &readfds);
                     printf("adding client-%d\n", client_sockfd);
+                    fd_count++;
                 } else {
                     int size;
-                    read(fd, &size, sizeof(int));
+                    ioctl(fd, FIONREAD, &size);
                     
                     char *msg = malloc(sizeof(char) * size);
-                    read(fd, msg, 256);
+                    read(fd, msg, size);
 
-                    if (strcmp(msg, "exit") == 0) {
+                    if (strcmp(msg, "/exit") == 0) {
                         close(fd);
                         FD_CLR(fd, &readfds);
                         printf("removing client-%d\n", fd);
+                        fd_count--;
+                    } else if (strcmp(msg, "/list") == 0) {
+                        // ** server shows to a client a list of clients **
                     } else {
                         printf("client-%d message (%d bytes): %s\n", fd, size, msg);
+                        
+                        for (int fd_i = 4; fd_i < fd_count; fd_i++) {
+                            if (fd_i != fd) {
+                                int size1 = size + 15;
+                                char *buf = malloc(sizeof(char) * size1);
+                                sprintf(buf, "client-%d: %s", fd, msg);
+                                write(fd_i, &size1, sizeof(int));
+                                write(fd_i, buf, size1);
+                                free(buf);
+                            }
+                        }
                     }
 
                     free(msg);

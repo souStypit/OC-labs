@@ -2,10 +2,13 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <signal.h>
 #include <unistd.h> 
 #include <sys/types.h> 
 #include <sys/socket.h> 
+#include <sys/wait.h> 
 #include <netinet/in.h> 
+#include <sys/ioctl.h> 
 #include <arpa/inet.h> 
 
 #define CLIENT_MSG_SIZE 256
@@ -17,7 +20,6 @@ int main() {
     int sockfd;
     int len, result;
     struct sockaddr_in address;
-    char *msg;
     
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -31,21 +33,51 @@ int main() {
         perror("oops: client1");
         exit(1);
     }
+    
+    printf("<----- CHAT ---->\n");
 
     int flag = 1;
+    pid_t pid = fork();
+    if (pid == -1) {
+        printf("Fork failed");
+        exit(1);
+    }
+
     do {
-        printf("Write a message: ");
-        msg = setString();
-        int size = strlen(msg) + 1;
+        if (pid == 0){
+            int size, res;
+            //ioctl(sockfd, FIONREAD, &size);
+            res = read(sockfd, &size, sizeof(int));
+            if (res == 0) {
+                exit(0);
+            }
 
-        write(sockfd, &size, sizeof(int));
-        write(sockfd, msg, size);
+            char *msg1 = malloc(sizeof(char) * size);
+            res = read(sockfd, msg1, size);
 
-        if (strcmp(msg, "exit") == 0) flag = 0;
-        free(msg);
+            if (res == 0) {
+                free(msg1);
+                exit(0);
+            } else {
+                printf("%s\n", msg1);
+                free(msg1);
+            }
+            
+        } else {
+            char *msg = setString();
+            int size = strlen(msg) + 1;
+
+            write(sockfd, msg, size);
+
+            if (strcmp(msg, "/exit") == 0) {
+                flag = 0;
+                close(sockfd);
+                wait(NULL);
+            }
+            free(msg);
+        }
     } while (flag);
 
-    close(sockfd);
     exit(0);
 }
 

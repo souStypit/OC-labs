@@ -7,6 +7,8 @@
         "ioctl.h": "c",
         "stdio.h": "c",
         "time.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "select.h": "c",
+        "string.h": "c"
     }
 }
