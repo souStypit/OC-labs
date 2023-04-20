@@ -32,7 +32,6 @@ int main() {
     FD_SET(server_sockfd, &readfds);
     
     while(1) {
-        char msg[CLIENT_MSG_SIZE];
         int fd;
 
         testfds = readfds;
@@ -52,15 +51,21 @@ int main() {
                     FD_SET(client_sockfd, &readfds);
                     printf("adding client-%d\n", client_sockfd);
                 } else {
-                    read(fd, &msg, CLIENT_MSG_SIZE);
+                    int size;
+                    read(fd, &size, sizeof(int));
+                    
+                    char *msg = malloc(sizeof(char) * size);
+                    read(fd, msg, 256);
+
                     if (strcmp(msg, "exit") == 0) {
                         close(fd);
                         FD_CLR(fd, &readfds);
                         printf("removing client-%d\n", fd);
                     } else {
-                        printf("client-%d message: %s\n", fd, msg);
-                        write(fd, &msg, CLIENT_MSG_SIZE);
+                        printf("client-%d message (%d bytes): %s\n", fd, size, msg);
                     }
+
+                    free(msg);
                 }
             }
         }
