@@ -9,7 +9,6 @@
 #include <netinet/in.h> 
 #include <arpa/inet.h> 
 #include <pthread.h>
-#include <semaphore.h>
 
 void *receive_msg(void *arg);
 void *send_msg(void *arg);
@@ -35,7 +34,6 @@ int main() {
         perror("Client error");
         exit(1);
     }
-    
     
     printf("<----- CHAT ---->\n\n");
 
@@ -116,7 +114,6 @@ void* send_msg(void *arg) {
             if (res == 0 || strcmp(msg, "/exit") == 0) {
                 exit(0);
             }
-
             
             free(msg);
         }
