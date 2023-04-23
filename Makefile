@@ -26,7 +26,7 @@ lab5: $(LAB5PATH)main.c
 
 lab6: $(LAB6PATH)server.c $(LAB6PATH)client.c
 	$(CC) $(CFLAGS) -o server $(LAB6PATH)server.c
-	$(CC) $(CFLAGS) -o client $(LAB6PATH)client.c
+	$(CC) $(CFLAGS) -o client $(LAB6PATH)client.c -lpthread
 
 ###CLANGS###
 clang: clang_rb clang_lab1 clang_lab3 clang_lab6
