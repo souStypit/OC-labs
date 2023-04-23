@@ -42,7 +42,7 @@ int main(void) {
 int shell(char **args) {
     if (strcmp(args[0], "exit") == 0) return 0;
     if (strcmp(args[0], "cd") == 0) return shell_cd(args);
-    
+
     pid = fork();
     switch (pid) {
         case -1:
@@ -64,14 +64,16 @@ int shell_cd(char **args) {
     } else {
         printf("usage: cd <directory>\n");
     }
-    
+
     return 1;
 }
 void signal_handler(int sig) {
     printf("Stoping the program with id: %d\n", pid);
 
-    if (pid == -1) kill(0, SIGTERM);
-    else kill(pid, sig);
+    if (pid == -1)
+        kill(0, SIGTERM);
+    else
+        kill(pid, sig);
 }
 void errorMessage(int condition, const char *fmt, ...) {
     //#include <stdarg.h>
@@ -85,7 +87,7 @@ void errorMessage(int condition, const char *fmt, ...) {
 }
 char **parseString(char *line) {
     if (line == NULL) return NULL;
-    
+
     int i = 0;
     char *delim = " \t\n\r", *token = strtok(line, delim);
     char **tokens = malloc(sizeof(char *));
@@ -118,5 +120,8 @@ char *setString(void) {
 
     // errorMessage(!i, "Empty string.");
     // return string;
-    return (i) ? string : NULL;
+    if (i) return string;
+
+    free(string);
+    return NULL;
 }

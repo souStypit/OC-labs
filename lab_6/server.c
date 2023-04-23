@@ -1,11 +1,11 @@
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+#include <sys/ioctl.h>
+#include <sys/select.h>
 #include <sys/socket.h>
-#include <sys/select.h> 
-#include <sys/ioctl.h> 
-#include <netinet/in.h>
+#include <unistd.h>
 
 #define INIT_CLIENT 4
 
@@ -27,9 +27,9 @@ int main() {
 
     FD_ZERO(&readfds);
     FD_SET(server_sockfd, &readfds);
-    
+
     int fd_count = INIT_CLIENT;
-    while(1) {
+    while (1) {
         testfds = readfds;
 
         result = select(fd_count, &testfds, (fd_set *)NULL, (fd_set *)NULL, (struct timeval *)NULL);
@@ -42,20 +42,21 @@ int main() {
             if (FD_ISSET(fd, &testfds)) {
                 if (fd == server_sockfd) {
                     client_len = sizeof(client_address);
-                    client_sockfd = accept(server_sockfd, (struct sockaddr *)&client_address, (socklen_t *)&client_len);
+                    client_sockfd = accept(server_sockfd, (struct sockaddr *)&client_address,
+                                           (socklen_t *)&client_len);
                     FD_SET(client_sockfd, &readfds);
                     printf("adding client-%d\n", client_sockfd);
                     fd_count++;
                 } else {
                     int size;
                     ioctl(fd, FIONREAD, &size);
-                    
+
                     char *msg = malloc(sizeof(char) * size);
                     read(fd, msg, size);
 
                     if (strcmp(msg, "/exit") == 0) {
                         printf("removing client-%d\n", fd);
-                        
+
                         close(fd);
                         FD_CLR(fd, &readfds);
                         fd_count--;
@@ -70,7 +71,7 @@ int main() {
                         }
                     } else {
                         printf("client-%d says: %s\n", fd, msg);
-                        
+
                         for (int fd_i = INIT_CLIENT; fd_i < fd_count; fd_i++) {
                             if (fd_i != fd) {
                                 int code = 0;

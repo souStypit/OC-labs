@@ -1,14 +1,14 @@
-#include <stdio.h> 
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <signal.h>
-#include <unistd.h> 
-#include <sys/types.h> 
-#include <sys/socket.h> 
-#include <netinet/in.h> 
-#include <arpa/inet.h> 
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #include <pthread.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 void *receive_msg(void *arg);
 void *send_msg(void *arg);
@@ -34,7 +34,7 @@ int main() {
         perror("Client error");
         exit(1);
     }
-    
+
     printf("<----- CHAT ---->\n\n");
 
     pthread_create(&thread_receive, NULL, receive_msg, &sockfd);
@@ -46,9 +46,9 @@ int main() {
     close(sockfd);
     exit(0);
 }
-void* receive_msg(void *arg) {
+void *receive_msg(void *arg) {
     int sockfd = *(int *)arg;
-    while(1) {
+    while (1) {
         int size, res, code;
         res = read(sockfd, &code, sizeof(int));
         if (res == -1) {
@@ -98,11 +98,11 @@ void* receive_msg(void *arg) {
         }
     }
 }
-void* send_msg(void *arg) {
+void *send_msg(void *arg) {
     int sockfd = *(int *)arg;
-    while(1) {
+    while (1) {
         char *msg = setString();
-        if (msg) { 
+        if (msg) {
             int size = strlen(msg) + 1;
             int res = write(sockfd, msg, size);
 
@@ -114,7 +114,7 @@ void* send_msg(void *arg) {
             if (res == 0 || strcmp(msg, "/exit") == 0) {
                 exit(0);
             }
-            
+
             free(msg);
         }
     }
@@ -144,5 +144,8 @@ char *setString(void) {
 
     // errorMessage(!i, "Empty string.");
     // return string;
-    return (i) ? string : NULL;
+    if (i) return string;
+
+    free(string);
+    return NULL;
 }
