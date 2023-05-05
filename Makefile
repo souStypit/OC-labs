@@ -26,7 +26,7 @@ lab5: $(LAB5PATH)main.c
 
 lab6: $(LAB6PATH)server.c $(LAB6PATH)client.c
 	$(CC) $(CFLAGS) -o server $(LAB6PATH)server.c
-	$(CC) $(CFLAGS) -o client $(LAB6PATH)client.c
+	$(CC) $(CFLAGS) -o client $(LAB6PATH)client.c -lpthread
 
 ###CLANGS###
 clang: clang_rb clang_lab1 clang_lab3 clang_lab6
@@ -49,9 +49,9 @@ clang_lab3:
 ###NOT CLANG LAB5
 
 clang_lab6:
-	mv .clang-format $(LAB3PATH)
-	clang-format -i $(LAB3PATH)*.c
-	mv $(LAB3PATH).clang-format ./
+	mv .clang-format $(LAB6PATH)
+	clang-format -i $(LAB6PATH)*.c
+	mv $(LAB6PATH).clang-format ./
 
 ###CLEANS###
 clean: clean_rb clean_lab_1_build clean_lab_3_build clean_lab_5_build clean_lab_6_build
@@ -70,4 +70,5 @@ clean_lab_5_build:
 	rm -f sobel
 
 clean_lab_6_build:
-	rm -f sockets
+	rm -f client
+	rm -f server
