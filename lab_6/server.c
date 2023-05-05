@@ -5,6 +5,7 @@
 #include <sys/ioctl.h>
 #include <sys/select.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <unistd.h>
 
 #define INIT_CLIENT 4
@@ -18,7 +19,8 @@ int main() {
     server_sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
     server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = htonl(INADDR_ANY);
+    //server_address.sin_addr.s_addr = htonl(INADDR_ANY);
+    server_address.sin_addr.s_addr = inet_addr("25.66.150.161");
     server_address.sin_port = htons(9734);
     server_len = sizeof(server_address);
 
